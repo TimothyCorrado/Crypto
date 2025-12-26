@@ -1,11 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>PulseChain Portfolio Tracker</title>
+  <meta charset="utf-8" />
+  <title>Read-Only Portfolio (24H)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6/dist/ethers.umd.min.js"></script>
+
+  <style>
+    :root{
+      --bg:#0b0e14; --card:#101522; --border:#1b2438;
+      --muted:#9aa4b2; --text:#eaeaea; --warn:#ffcc66; --ok:#9fe7a4;
+    }
+    body{ margin:0; background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; }
+    .wrap{ max-width:1200px; margin:0 auto; }
+    header{
+      padding:16px; border-bottom:1px solid var(--border);
+      display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap;
+    }
+    .left{ display:flex; flex-direction:column; gap:10px; min-width:320px; max-width:720px; flex:1; }
+    .title{ font-weight:800; font-size:16px; }
+    .mono{ font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono"; font-size:13px; color:var(--muted); }
+    .status.ok{ color:var(--ok); }
+    .status.warn{ color:var(--warn); }
+
+    .inputs{
+      display:grid; gap:10px; padding:12px;
+      border:1px solid var(--border); border-radius:12px; background:var(--card);
+    }
+    .row{ display:grid; grid-template-columns:120px 1fr; gap:10px; align-items:center; }
+    input, textarea{
+      padding:10px; border-radius:10px; border:1px solid #2a3858;
+      background:#0e1320; color:var(--text); outline:none; width:100%;
+    }
+    textarea{ resize:vertical; min-height:90px; font-family:ui-monospace; }
+    button{
+      border:1px solid #2a3858; background:#0e1320; color:var(--text);
+      border-radius:10px; padding:10px 12px; cursor:pointer;
+    }
+
+    .right{
+      min-width:240px; text-align:right; padding:12px;
+      border:1px solid var(--border); border-radius:12px; background:var(--card);
+    }
+    .total{ font-size:28px; font-weight:900; }
+
+    .card{
+      margin:16px; padding:14px;
+      border:1px solid var(--border); border-radius:12px; background:var(--card);
+    }
+
+    table{ width:100%; border-collapse:collapse; }
+    th, td{ padding:10px 8px; border-top:1px solid var(--border); text-align:right; }
+    th{ color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.08em; border-top:0; }
+    th:first-child, td:first-child{ text-align:left; }
+    .tokenName{ font-weight:900; }
+    .err{ color:var(--warn); }
+  </style>
 </head>
+
 <body>
-  <h1>PulseChain Portfolio Tracker</h1>
-  <p>Wallet tracking dashboard coming soon.</p>
+  <div class="wrap">
+    <header>
+      <div class="left">
+        <div class="title">Crypto Read-Only Portfolio (24H)</div>
+        <div id="status" class="mono status ok">Enter wallet + tokens, then click Load.</div>
+
+        <div class="inputs">
+          <div class="row">
+            <div class="mono">Wallet</div>
+            <input id="walletInput" placeholder="0x..." />
+          </div>
+
+          <div class="row" style="align-items:flex-start;">
+            <div class="mono" style="padding-top:10px;">Tokens</div>
+            <textarea id="tokensInput" placeholder="Paste token contract addresses (one per line or comma-separated)"></textarea>
+          </div>
+
+          <div style="display:flex; gap:10px;">
+            <button id="loadBtn">Load</button>
+            <button id="clearBtn">Clear</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="right">
+        <div class="mono">Total (USD)</div>
+        <div class="total" id="total">$0.00</div>
+        <div class="mono" id="meta">—</div>
+      </div>
+    </header>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Token</th>
+            <th>Balance</th>
+            <th>Price</th>
+            <th>Value</th>
+            <th>24H</th>
+            <th>Error</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>
